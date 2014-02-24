@@ -11,11 +11,11 @@
 <script>
 (function() {
 
-var a = 0.1;        // y = ax^2の係数
+var a = 0.3;        // y = ax^2の係数
 var iMax = 100;     // x方向の最大個数
-var jMax = 300;     // y方向の最大個数
+var jMax = 500;     // y方向の最大個数
 var size = 50;      // 立方体の一辺の長さ
-var interval = 100; // 立方体の間隔
+var interval = 50; // 立方体の間隔
 
 var screen = document.getElementById("screen");
 var width = window.innerWidth, height = window.innerHeight;
@@ -91,7 +91,14 @@ function init() {
 
 	scene.add( container );
 
-	camera.position.set( 0, -(size+interval)*10, (size+interval)*1.5 );
+	camera.position.set( 0, -(size+interval)*10, (size+interval)*2 );
+
+	var grid = new THREE.GridHelper( 50000, 500 );
+	grid.setColors( 0x228822, 0x228822 );
+	grid.rotateX( Math.PI * 0.5 );
+	grid.position.z = - size * 0.5;
+	grid.position.y = 40000;
+	scene.add( grid );
 
 }
 
