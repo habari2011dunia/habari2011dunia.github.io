@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>放物線の大陸</title>
+<script src="js/three.min.js"></script>
+<script src="js/OrbitControls.js"></script>
+</head>
+<body>
+<div id="screen"></div>
+<script>
+(function() {
+
+var a = 0.1;        // y = ax^2の係数
+var iMax = 100;     // x方向の最大個数
+var jMax = 300;     // y方向の最大個数
+var size = 50;      // 立方体の一辺の長さ
+var interval = 100; // 立方体の間隔
+
+var screen = document.getElementById("screen");
+var width = window.innerWidth, height = window.innerHeight;
+var scene, renderer, camera, controls;
+var fov = 45, aspect = width/height, near = 1, far = 100000;
+
+init();
+animate();
+
+function init() {
+
+	// シーン //
+	scene = new THREE.Scene();
+
+	// レンダラー //
+	renderer = new THREE.WebGLRenderer();
+	renderer.setSize( width, height );
+	renderer.setClearColor( 0x000000 );
+	screen.appendChild( renderer.domElement );
+
+	// カメラ //
+	camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
+	camera.up.set( 0, 0, 1 );
+
+	// コントロール //
+	controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+	// ライト //
+	var light = new THREE.DirectionalLight( 0xffffff, 1 ); // 平行光源
+	light.position.set( 0.5, -0.1, 1 );
+	scene.add( light );
+
+	var ambient = new THREE.AmbientLight( 0x222222 ); // 環境光源
+	scene.add( ambient );
+
+	// 立方体
+	container = new THREE.Object3D();
+	scene.add(container);
+
+	var geometry = new THREE.Geometry();
+	var meshItem = new THREE.Mesh(new THREE.BoxGeometry(size, size, size)); // 立方体個別の要素
+
+	meshItem.position.z = 0;
+
+	var x = y = 0;
+	for(var i=0; i < iMax; i++) {
+
+		x = (size + interval) * i;
+
+		for(var j=Math.ceil(i*i*a); j <= jMax; j++) {
+
+			y = (size + interval) * j;
+
+			meshItem.position.x = x;
+			meshItem.position.y = y;
+
+			THREE.GeometryUtils.merge(geometry, meshItem);
+
+			meshItem.position.x = -x;
+
+			THREE.GeometryUtils.merge(geometry, meshItem);
+
+		}
+
+	}
+
+	var mesh = new THREE.Mesh(
+		geometry,
+		new THREE.MeshLambertMaterial({ color: 0xcccccc })
+	);
+
+	container.add( mesh );
+
+	scene.add( container );
+
+	camera.position.set( 0, -(size+interval)*10, (size+interval)*1.5 );
+
+}
+
+function render() {
+
+	renderer.render( scene, camera );
+
+}
+
+function animate() {
+
+	requestAnimationFrame(animate);
+
+	controls.update();
+	render();
+
+}
+
+})();
+</script>
+</body>
+</html>
