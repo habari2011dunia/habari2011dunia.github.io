@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Share MathJax + WolframAlpha</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="../script.js"></script>
+  <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  <script>
+  MathJax.Hub.Config({
+    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+    skipStartupTypeset: true
+  });
+  </script>
+</head>
+<body>
+  <div class="row">
+    <div id="result"></div>
+  </div>
+  <div>
+    <a href="" id="edit-link">&laquo;edit</a> |
+    Link URL: <input type="text" id="share-link">
+    <span id="twitter-wrapper">
+    <a class="twitter-share-button" href="https://twitter.com/share">Tweet</a>
+    </span>
+  </div>
+<script>
+window.twttr=(function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],t=window.twttr||{};if(d.getElementById(id))return t;js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);t._e=[];t.ready=function(f){t._e.push(f);};return t;}(document,"script","twitter-wjs"));
+</script>
+<script>
+$(function() {
+
+  // このページのURL
+  $("#share-link").val(document.location.href);
+  // フォーカス時にリンク共有用URLを全選択状態にする
+  $("#share-link").focus(
+    function() { $(this).select(); }
+  );
+
+  // 編集ページヘのリンク作成
+  var url = document.location.protocol + '//' +
+    document.location.hostname +
+    document.location.pathname.replace(new RegExp('view/?(index\.html)?$'), 'edit/') +
+    document.location.search;
+  $("#edit-link").attr("href", url);
+
+  // クエリ文字列を読み取って変換
+  var params = getQueryParams();
+  if (typeof params['i'] !== 'undefined') {
+    typeset(
+      $("#result"),
+      params['i'],
+      typeof params['w'] !== 'undefined' && params['w']
+    );
+  }
+
+});
+</script>
+</body>
+</html>

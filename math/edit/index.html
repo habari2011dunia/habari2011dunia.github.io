@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Share MathJax + WolframAlpha</title>
+  <link rel="stylesheet" href="../style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="../script.js"></script>
+  <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  <script>
+  MathJax.Hub.Config({
+    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+    skipStartupTypeset: true
+  });
+  </script>
+</head>
+<body>
+  <h1>Share MathJax + WolframAlpha</h1>
+  <div class="row">
+    <h2>Input</h2>
+    <div>
+      <textarea id="input" rows="10">Inline math examples: $\frac{1 + \sqrt{5}}{2}$, $x^2 - y^2 = 1$, $\sin \theta$
+
+Display math examples:
+$$ \int_{-\infty}^\infty e^{-x^2} \, dx $$
+$$ \sum_{n=1}^\infty \frac{1}{n^2} $$</textarea>
+    </div>
+    <div>
+      <input type="button" id="typeset" value="Typeset">
+      <input type="checkbox" id="wa">
+      <label for="wa">
+        Add Link to <a href="https://www.wolframalpha.com/">WolframAlpha</a>
+      </label>
+    </div>
+  </div>
+  <div class="row">
+    <h2>Result</h2>
+    <div id="result"></div>
+    <strong><a href="" id="view-link">&raquo;view</a></strong>
+  </div>
+  <div class="row">
+    <h2>Share</h2>
+    <div>
+      Link URL: <input type="text" id="share-link"><br />
+      <span id="twitter-wrapper">
+      <a class="twitter-share-button" href="https://twitter.com/share">Tweet</a>
+      </span>
+    </div>
+  </div>
+<script>
+window.twttr=(function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],t=window.twttr||{};if(d.getElementById(id))return t;js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);t._e=[];t.ready=function(f){t._e.push(f);};return t;}(document,"script","twitter-wjs"));
+</script>
+<script>
+$(function() {
+
+  // このページのURL
+  $("#share-link").val(document.location.href);
+  // フォーカス時にリンク共有用URLを全選択状態にする
+  $("#share-link").focus(
+    function() { $(this).select(); }
+  );
+
+  // クエリ文字列を解釈
+  var params = getQueryParams();
+  $("#wa").prop("checked", typeof params['w'] !== 'undefined' && params['w']);
+  if (typeof params['i'] !== 'undefined') {
+    $("#input").val(params['i']);
+    typeset(
+      $("#result"),
+      $("#input").val(),
+      $("#wa").prop("checked")
+    );
+    updateViewPageLink($("#input").val());
+  }
+
+  // ボタンクリックでコマンド変換を実行
+  $("#typeset").click(function() {
+    typeset(
+      $("#result"),
+      $("#input").val(),
+      $("#wa").prop("checked")
+    );
+    updateViewPageLink($("#input").val());
+  });
+
+  // ViewページヘのリンクURLを生成する
+  function updateViewPageLink(input) {
+    var url = document.location.protocol + '//' +
+      document.location.hostname +
+      document.location.pathname.replace(new RegExp('edit/?(index\.html)?$'), 'view/') +
+      '?i=' + encodeURIComponent(input);
+    if ($("#wa").prop("checked")) url += '&w=1';
+
+    $("#share-link").val(url);
+    $("#view-link").attr("href", url);
+    $("#twitter-wrapper").html('<a class="twitter-share-button" href="https://twitter.com/share" data-url="' + url + '">Tweet</a>');
+    twttr.ready(function(twttr) { twttr.widgets.load(); });
+  }
+});
+</script>
+</body>
+</html>
